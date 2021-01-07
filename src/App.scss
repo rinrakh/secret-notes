@@ -1,0 +1,73 @@
+// /*!
+//  * Bootstrap v5.0.0-beta1 (https://getbootstrap.com/)
+//  * Copyright 2011-2020 The Bootstrap Authors
+//  * Copyright 2011-2020 Twitter, Inc.
+//  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+//  */
+
+// Configuration
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/utilities";
+
+// // Layout & components
+// @import "bootstrap/scss/root";
+// @import "bootstrap/scss/reboot";
+// @import "bootstrap/scss/containers";
+// @import "bootstrap/scss/grid";
+
+@import "~bootstrap/scss/bootstrap";
+
+/**
+ * Main styles
+ */
+body {
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.wrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 350px;
+    height: 100vh;
+    width: 30%;
+    overflow-y: scroll;
+    position: relative;
+}
+
+#create-note {
+    min-width: 250px;
+    max-width: calc(350px - 16px);
+    padding-right: calc(var(--bs-gutter-x) / 2);
+    padding-left: calc(var(--bs-gutter-x) / 2);
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+#logo {
+    a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin-top: $spacer;
+        margin-bottom: $spacer;
+        text-decoration: none;
+        color: $dark;
+    }
+    img {
+        width: 25px;
+        height: 25px;
+        margin-right: $spacer * .25;
+    }
+}

@@ -1,0 +1,59 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+#note-list {
+    margin-bottom: 70px;
+    .note-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0;
+        // justify-content: space-between;
+        span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: $font-size-lg;
+            font-weight: 600;
+            margin-right: $spacer;
+        }
+        .note-toggle {
+            margin-left: auto;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            outline: initial;
+            img {
+                width: 10px;
+                height: 10px;
+            }
+        }
+    }
+    .note-toggle {
+        border-radius: 50%;
+        border: 1px solid $border-color;
+    }
+    .note-date {
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding-left: 4px;
+        padding-right: 4px;
+        color: $gray-600;
+        background-color: $light;
+        font-family: monospace;
+    }
+    .note-preview {
+        margin-top: 0;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        @include transition($transition-base);
+        &.show {
+            margin-top: $spacer;
+            max-height: 100px;
+            opacity: 1;
+        }
+    }
+}
