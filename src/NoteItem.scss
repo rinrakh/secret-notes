@@ -1,0 +1,37 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+#note-item {
+    min-width: 100%;
+    min-height: 100%;
+    padding: 5rem;
+    header {
+        // display: flex;
+        h1 {
+            margin: 0;
+        }
+        .edit-note {
+            margin-left: auto;
+            height: auto;
+            padding-left: $spacer * 3;
+            padding-right: $spacer * 3;
+        }
+        .close-note {
+            margin-left: $spacer;
+            height: auto;
+            padding-left: $spacer * 3;
+            padding-right: $spacer * 3;
+        }
+    }
+    // .close-note {
+    //     position: absolute;
+    //     right: 0;
+    //     top: 0;
+    //     outline: initial;
+    //     box-shadow: initial;
+    //     img {
+    //         min-width: 25px;
+    //         min-height: 25px;
+    //     }
+    // }
+}

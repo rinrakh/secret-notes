@@ -6,32 +6,33 @@ import './Sidebar.scss'
 
 export default function Sidebar() {
     const [notes, setNotes] = useState([]);
-    const [isLoaded, setIsLoaded] = useState(false)
-    const [error, setError] = useState(null)
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetch('/notes')
-            .then(response => {
-                if (!response.ok)
-                    setError(response.statusText);
-                return response.json()
-            })
-            .then((data) => {
-                setNotes(data)
-                setIsLoaded(true)
-            })
-    }, [])
+            .then(res => res.json())
+            .then((result) => {
+                    setIsLoaded(true);
+                    setNotes(result);
+                },
+                (error) => {
+                    setIsLoaded(true);
+                    setError(error);
+                }
+            )
+    }, []);
 
-    let noteList
+    let noteList;
 
     if (error != null) {
-        noteList = <div>Error: {error}</div>
+        noteList = <div>Error: {error}</div>;
     } else if (!isLoaded) {
-        noteList = <div>Loading...</div>
+        noteList = <div>Loading...</div>;
     } else {
         noteList = notes.map((note) => (
             <NoteListItem key={note.id} note={note} />
-        ))
+        ));
     }
 
     return(
