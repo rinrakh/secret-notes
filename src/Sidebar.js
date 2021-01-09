@@ -45,12 +45,14 @@ export default function Sidebar() {
                     </a>
                 </section>
                 <section id="search">
+                    {/* @TODO: write search component */}
                     <input type="search" name="search" className="form-control" placeholder="Type a search.." />
                 </section>
                 <section id="note-list">
                     {noteList}
                 </section>
                 <section id="create-note" className="bg-light pt-3">
+                    {/* @TODO: write add a note component */}
                     <button type="button" className="btn btn-primary btn-block w-100 mb-3 fw-bold">+ Add a note</button>
                 </section>
             </section>
