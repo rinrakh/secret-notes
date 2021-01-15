@@ -21,7 +21,7 @@
 const express = require('express');
 // const compress = require('compression');
 const {readFileSync} = require('fs');
-// const {unlink, writeFile} = require('fs/promises');
+const {unlink, writeFile} = require('fs/promises');
 // const {pipeToNodeWritable} = require('react-server-dom-webpack/writer');
 const path = require('path');
 const {Pool} = require('pg');
@@ -30,6 +30,7 @@ const {Pool} = require('pg');
 
 // // Don't keep credentials in the source tree in a real app!
 const pool = new Pool(require('../credentials'));
+const NOTES_PATH = path.resolve(__dirname, '../notes');
 
 const PORT = 3001;
 const app = express();
@@ -66,6 +67,25 @@ app.get(
       req.params.id,
     ]);
     res.json(rows[0]);
+  })
+);
+
+app.post(
+  '/notes',
+  handleErrors(async function(req, res) {
+    // console.log(111);
+    const now = new Date();
+    const result = await pool.query(
+      'insert into notes (title, body, created_at, updated_at) values ($1, $2, $3, $3) returning id',
+      [req.body.title, req.body.body, now]
+    );
+    const insertedId = result.rows[0].id;
+    await writeFile(
+      path.resolve(NOTES_PATH, `${insertedId}.md`),
+      req.body.body,
+      'utf8'
+    );
+    res.json({ok: true})
   })
 );
 

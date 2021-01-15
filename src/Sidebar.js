@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from 'react';
+import {useLocation} from './LocationContext'
 import NoteListItem from './NoteListItem';
 import logo from './media/logo.svg'
 import './Sidebar.scss'
 
 
 export default function Sidebar() {
+    const [location, setLocation] = useLocation();
     const [notes, setNotes] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const [error, setError] = useState(null);
@@ -21,7 +23,7 @@ export default function Sidebar() {
                     setError(error);
                 }
             )
-    }, []);
+    }, [location.isEditing]);
 
     let noteList;
 
@@ -53,7 +55,17 @@ export default function Sidebar() {
                 </section>
                 <section id="create-note" className="bg-light pt-3">
                     {/* @TODO: write add a note component */}
-                    <button type="button" className="btn btn-primary btn-block w-100 mb-3 fw-bold">+ Add a note</button>
+                    <button
+                        type="button"
+                        className="btn btn-primary btn-block w-100 mb-3 fw-bold"
+                        onClick={() => {
+                            setLocation({
+                                isEditing: true
+                            })
+                        }}
+                    >
+                        + Add a note
+                    </button>
                 </section>
             </section>
         </aside>
