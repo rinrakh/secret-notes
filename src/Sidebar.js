@@ -54,7 +54,6 @@ export default function Sidebar() {
                     {noteList}
                 </section>
                 <section id="create-note" className="bg-light pt-3">
-                    {/* @TODO: write add a note component */}
                     <button
                         type="button"
                         className="btn btn-primary btn-block w-100 mb-3 fw-bold"

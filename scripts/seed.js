@@ -1,43 +1,30 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
-const {Pool} = require('pg');
-const {readdir, unlink, writeFile} = require('fs/promises');
-const startOfYear = require('date-fns/startOfYear');
-const credentials = require('../credentials');
+const dbFile = '../data/db.sqlite';
 
-const NOTES_PATH = './notes';
-const pool = new Pool(credentials);
+
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database(path.resolve(__dirname, dbFile));
 
 const now = new Date();
+const startOfYear = require('date-fns/startOfYear');
 const startOfThisYear = startOfYear(now);
-// Thanks, https://stackoverflow.com/a/9035732
 function randomDateBetween(start, end) {
   return new Date(
     start.getTime() + Math.random() * (end.getTime() - start.getTime())
   );
 }
 
-const dropTableStatement = 'DROP TABLE IF EXISTS notes;';
-const createTableStatement = `CREATE TABLE notes (
-  id SERIAL PRIMARY KEY,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL,
-  title TEXT,
-  body TEXT
-);`;
-const insertNoteStatement = `INSERT INTO notes(title, body, created_at, updated_at)
-  VALUES ($1, $2, $3, $3)
-  RETURNING *`;
+const dropTableNotes = `DROP TABLE IF EXISTS notes;`;
+const createTableNotes = `CREATE TABLE notes(
+  id INTEGER PRIMARY KEY NOT NULL,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  body CLOB NOT NULL
+)`;
+const insertNoteStatement = `INSERT INTO notes(title, body, created_at, updated_at) VALUES ($1, $2, $3, $3)`;
 const seedData = [
   [
     'Meeting Notes',
@@ -62,31 +49,16 @@ notes in this app! These note live on the server in the \`notes\` folder.
 ];
 
 async function seed() {
-  await pool.query(dropTableStatement);
-  await pool.query(createTableStatement);
-  const res = await Promise.all(
-    seedData.map((row) => pool.query(insertNoteStatement, row))
-  );
-
-  const oldNotes = await readdir(path.resolve(NOTES_PATH));
-  await Promise.all(
-    oldNotes
-      .filter((filename) => filename.endsWith('.md'))
-      .map((filename) => unlink(path.resolve(NOTES_PATH, filename)))
-  );
-
-  await Promise.all(
-    res.map(({rows}) => {
-      const id = rows[0].id;
-      const content = rows[0].body;
-      const data = new Uint8Array(Buffer.from(content));
-      return writeFile(path.resolve(NOTES_PATH, `${id}.md`), data, (err) => {
-        if (err) {
-          throw err;
-        }
-      });
-    })
-  );
+  db.serialize(() => {
+    db.run(dropTableNotes);
+    db.run(createTableNotes);
+    seedData.map((row) => db.run(insertNoteStatement, row))
+  })
 }
 
 seed();
+
+
+// const rows = db.each(`SELECT id,title,updated_at as upd FROM notes`, [], (err, row) => {
+//   console.log(err + ' : ' + row.id + ' : ' + row.title + ' : ' + row.upd);
+// });

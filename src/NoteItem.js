@@ -57,6 +57,7 @@ export default function NoteItem() {
                 }
             },
             (error) => {
+                // @TODO: throw error message
                 console.log(error);
             }
         )
@@ -69,6 +70,7 @@ export default function NoteItem() {
     }
 
     let noteContent = <div>Select a note on the left sidebar..</div>
+    // @TODO: write edit func for existing note
     if (location.isEditing) {
         noteContent = (
             <section id="note-item">
