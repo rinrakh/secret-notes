@@ -21,6 +21,7 @@ export default function NoteItem() {
     const [location, setLocation] = useLocation();
     const [note, setNote] = useState(null)
     const [isLoaded, setIsLoaded] = useState(false)
+    const [isDeleting, deleteNote] = useState(false)
     const [error, setError] = useState(null)
     const {value:title, set:setTitle, bind:bindTitle, reset:resetTitle} = useInput('Untitled')
     const {value:body, set:setBody, bind:bindBody, reset:resetBody} = useInput('')
@@ -52,7 +53,7 @@ export default function NoteItem() {
     async function handleSubmit(e) {
         e.preventDefault()
         let url = location.selectedId ? '/notes/' + location.selectedId : '/notes' ;
-        let method = location.selectedId ? 'put' : 'post' ;
+        let method = location.selectedId ? isDeleting ? 'delete' : 'put' : 'post' ;
         fetch(url, {
             method: method,
             body: JSON.stringify({title: title, body: body}),
@@ -63,11 +64,12 @@ export default function NoteItem() {
         .then(res => res.json())
         .then((result) => {
                 if(result.ok) {
-                    if (location.selectedId) {
+                    if (location.selectedId && !isDeleting) {
                         setLocation({isEditing: false, selectedId: location.selectedId})
-                    } else {
+                    } else if (isDeleting || null == location.selectedId) {
                         setLocation({isEditing: false, selectedId: null})
                         resetForm()
+                        deleteNote(false)
                     }
                 }
             },
@@ -83,10 +85,18 @@ export default function NoteItem() {
         resetBody()
     }
 
-    console.log( location)
     let noteContent = <div>Select a note on the left sidebar..</div>
     // @TODO: write edit func for existing note
     if (location.isEditing) {
+        let deleteButton = (
+            <button
+                type="submit"
+                className="btn btn-danger delete-note"
+                onClick={() => {
+                    deleteNote(true)
+                }}
+            >Delete</button>
+        )
         noteContent = (
             <section id="note-item">
                 <form onSubmit={handleSubmit}>
@@ -96,7 +106,7 @@ export default function NoteItem() {
                                 col-12 
                                 col-lg 
                                 flex-lg-shrink-1 
-                                h-100 mb-3 mb-lg-0
+                                h-100 mb-3 mb-xl-0
                             ">
                                 <small className="fst-italic text-muted">
                                     {location.selectedId ? 'Edit note' : 'Add a note' }
@@ -116,7 +126,7 @@ export default function NoteItem() {
                                 </button>
                                 <button
                                     type="button"
-                                    className="btn btn-danger close-note"
+                                    className="btn btn-light close-note"
                                     onClick={() => {
                                         setLocation({
                                             isEditing: false,
@@ -125,6 +135,7 @@ export default function NoteItem() {
                                         resetForm()
                                     }}
                                 >Cancel</button>
+                                {null != location.selectedId ? deleteButton : ''}
                             </div>
                         </div>
                         <h1 className="mt-4">
@@ -168,7 +179,7 @@ export default function NoteItem() {
                                 col-12 
                                 col-lg 
                                 flex-lg-shrink-1 
-                                h-100 mb-3 mb-lg-0
+                                h-100 mb-3 mb-xl-0
                             ">
                                 <small className="fst-italic text-muted">
                                     Last updated at: {lastUpdatedAt}

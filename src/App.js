@@ -13,7 +13,7 @@ export default function App() {
 
   return (
     <section className="wrapper container-fluid">
-      <section className="row w-100">
+      <section className="row w-100 flex-nowrap">
         <LocationContext.Provider value={[location, setLocation]}>
           <Sidebar />
 
