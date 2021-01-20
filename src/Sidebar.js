@@ -59,7 +59,8 @@ export default function Sidebar() {
                         className="btn btn-primary btn-block w-100 mb-3 fw-bold"
                         onClick={() => {
                             setLocation({
-                                isEditing: true
+                                selectedId: null,
+                                isEditing: true,
                             })
                         }}
                     >

@@ -42,7 +42,8 @@ app.get(
 app.get(
   '/notes/:id',
   handleErrors(async function(req, res) {
-    db.get(`SELECT * FROM notes WHERE id = $1`, [req.params.id], (err, rows) => {
+    const requestedId = Number(req.params.id);
+    db.get(`SELECT * FROM notes WHERE id = $1`, [requestedId], (err, rows) => {
       if (err) throw err;
       res.json(rows);
     });
@@ -67,3 +68,44 @@ app.post(
     });
   })
 );
+
+app.put(
+  '/notes/:id',
+  handleErrors(async function(req, res) {
+    const now = new Date();
+    const updatedId = Number(req.params.id);
+    db.run(
+      'UPDATE notes SET title = $1, body = $2, updated_at = $3 WHERE id = $4',
+      [req.body.title, req.body.body, now, updatedId],
+      (err) => {
+        if (err) throw err;
+      }
+    );
+    await writeFile(
+      path.resolve(NOTES_PATH, `${updatedId}.md`),
+      req.body.body,
+      'utf8'
+    );
+    res.json({ok: true})
+  })
+);
+
+
+
+// app.put(
+//   '/notes/:id',
+//   handleErrors(async function(req, res) {
+//     const now = new Date();
+//     const updatedId = Number(req.params.id);
+//     let stmt = db.prepare('UPDATE notes SET title = $1, body = $2, updated_at = $3 WHERE id = $4');
+//     stmt.run(req.body.title, req.body.body, now, updatedId, (err) => {
+//       if (err) throw err;
+//     });
+//     await writeFile(
+//       path.resolve(NOTES_PATH, `${updatedId}.md`),
+//       req.body.body,
+//       'utf8'
+//     );
+//     res.json({ok: true})
+//   })
+// );

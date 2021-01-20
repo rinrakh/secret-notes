@@ -11,9 +11,9 @@
             margin: 0;
         }
         .edit-note,.save-note {
-            margin-left: auto;
+            // margin-left: auto;
             min-width: 10rem;
-            max-width: 10rem;
+            max-width: 100%;
             height: auto;
             padding-left: $spacer * 3;
             padding-right: $spacer * 3;
@@ -21,7 +21,7 @@
         .close-note,.cancel-note {
             margin-left: $spacer;
             min-width: 10rem;
-            max-width: 10rem;
+            max-width: 100%;
             height: auto;
             padding-left: $spacer * 3;
             padding-right: $spacer * 3;
