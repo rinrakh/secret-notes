@@ -3,7 +3,6 @@
 const path = require('path');
 const dbFile = '../data/db.sqlite';
 
-
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(path.resolve(__dirname, dbFile));
 
@@ -52,13 +51,8 @@ async function seed() {
   db.serialize(() => {
     db.run(dropTableNotes);
     db.run(createTableNotes);
-    seedData.map((row) => db.run(insertNoteStatement, row))
-  })
+    seedData.map((row) => db.run(insertNoteStatement, row));
+  });
 }
 
 seed();
-
-
-// const rows = db.each(`SELECT id,title,updated_at as upd FROM notes`, [], (err, row) => {
-//   console.log(err + ' : ' + row.id + ' : ' + row.title + ' : ' + row.upd);
-// });

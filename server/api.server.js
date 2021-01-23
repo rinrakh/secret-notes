@@ -1,6 +1,5 @@
 'use strict';
 
-
 const express = require('express');
 const {unlink, writeFile} = require('fs/promises');
 const path = require('path');
@@ -17,10 +16,12 @@ const app = express();
 // app.use(compress());
 app.use(express.json());
 
-app.listen(PORT, () => console.log('Notes API listening at http://localhost:3001'));
+app.listen(PORT, () =>
+  console.log('Notes API listening at http://localhost:3001')
+);
 
 function handleErrors(fn) {
-  return async function(req, res, next) {
+  return async function (req, res, next) {
     try {
       return await fn(req, res);
     } catch (x) {
@@ -31,7 +32,7 @@ function handleErrors(fn) {
 
 app.get(
   '/notes',
-  handleErrors(async function(_req, res) {
+  handleErrors(async function (_req, res) {
     db.all(`SELECT * FROM notes`, [], (err, rows) => {
       if (err) throw err;
       res.json(rows);
@@ -41,7 +42,7 @@ app.get(
 
 app.get(
   '/notes/:id',
-  handleErrors(async function(req, res) {
+  handleErrors(async function (req, res) {
     const requestedId = Number(req.params.id);
     db.get(`SELECT * FROM notes WHERE id = $1`, [requestedId], (err, rows) => {
       if (err) throw err;
@@ -50,11 +51,32 @@ app.get(
   })
 );
 
+app.get(
+  '/notes/s/:value',
+  handleErrors(async function (req, res) {
+    const searchText = String(req.params.value);
+    db.all(
+      `SELECT * FROM notes WHERE title LIKE $1`,
+      ['%' + searchText + '%'],
+      (err, rows) => {
+        if (err) {
+          res.json(err.code);
+          throw err;
+        }
+        if (!rows) rows = [];
+        res.json(rows);
+      }
+    );
+  })
+);
+
 app.post(
   '/notes',
-  handleErrors(async function(req, res) {
-    db.serialize(function() {
-      let stmt = db.prepare(`INSERT INTO notes (title, body, created_at, updated_at) VALUES ($1, $2, $3, $3)`);
+  handleErrors(async function (req, res) {
+    db.serialize(function () {
+      let stmt = db.prepare(
+        `INSERT INTO notes (title, body, created_at, updated_at) VALUES ($1, $2, $3, $3)`
+      );
       stmt.run(req.body.title, req.body.body, new Date(), function (err) {
         if (err) throw err;
         writeFile(
@@ -62,7 +84,7 @@ app.post(
           req.body.body,
           'utf8'
         );
-        res.json({ok: true})
+        res.json({ok: true});
       });
       stmt.finalize();
     });
@@ -71,7 +93,7 @@ app.post(
 
 app.put(
   '/notes/:id',
-  handleErrors(async function(req, res) {
+  handleErrors(async function (req, res) {
     const now = new Date();
     const updatedId = Number(req.params.id);
     db.run(
@@ -86,23 +108,18 @@ app.put(
       req.body.body,
       'utf8'
     );
-    res.json({ok: true})
+    res.json({ok: true});
   })
 );
 
 app.delete(
   '/notes/:id',
-  handleErrors(async function(req, res) {
+  handleErrors(async function (req, res) {
     const updatedId = Number(req.params.id);
-    db.run(
-      'DELETE FROM notes WHERE id = $1',
-      [updatedId],
-      (err) => {
-        if (err) throw err;
-      }
-    );
+    db.run('DELETE FROM notes WHERE id = $1', [updatedId], (err) => {
+      if (err) throw err;
+    });
     await unlink(path.resolve(NOTES_PATH, `${updatedId}.md`));
-    res.json({ok: true})
+    res.json({ok: true});
   })
 );
-

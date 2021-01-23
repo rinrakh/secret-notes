@@ -21,13 +21,11 @@ export default function App() {
             id="content"
             className={[
               'col h-100',
-              (location.selectedId != null || location.isEditing) ? 'active' : '',
+              location.selectedId != null || location.isEditing ? 'active' : '',
             ].join(' ')}>
-
             <section className="content-inner">
               <NoteItem />
             </section>
-
           </main>
         </LocationContext.Provider>
       </section>
