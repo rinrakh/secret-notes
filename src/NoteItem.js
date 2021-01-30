@@ -1,25 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import {useLocation} from './LocationContext';
+import {FormContext} from './FormContext';
+import NoteShow from './NoteShow';
 import {useInput} from './hooks/input-hook';
-import {format} from 'date-fns';
-import marked from 'marked';
-import sanitizeHtml from 'sanitize-html';
-// import cross from './media/cross.svg'
+import Editor from './NoteEditor';
 import './NoteItem.scss';
-const allowedTags = sanitizeHtml.defaults.allowedTags.concat([
-  'img',
-  'h1',
-  'h2',
-  'h3',
-]);
-const allowedAttributes = Object.assign(
-  {},
-  sanitizeHtml.defaults.allowedAttributes,
-  {
-    img: ['alt', 'src'],
-  }
-);
 
+// @TODO: refactor NoteItem for readable code
 export default function NoteItem() {
   const [location, setLocation] = useLocation();
   const [note, setNote] = useState(null);
@@ -64,43 +51,46 @@ export default function NoteItem() {
     }
   }, [location.selectedId, location.isEditing]);
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
     let url = location.selectedId ? '/notes/' + location.selectedId : '/notes';
     let method = location.selectedId ? (isDeleting ? 'delete' : 'put') : 'post';
-    fetch(url, {
-      method: method,
-      body: JSON.stringify({title: title, body: body}),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          if (result.ok) {
-            if (location.selectedId && !isDeleting) {
-              setLocation({
-                isEditing: false,
-                selectedId: location.selectedId,
-                searchText: location.searchText,
-              });
-            } else if (isDeleting || null == location.selectedId) {
-              setLocation({
-                isEditing: false,
-                selectedId: null,
-                searchText: location.searchText,
-              });
-              resetForm();
-              deleteNote(false);
-            }
-          }
+    const fetchData = async () => {
+      await fetch(url, {
+        method: method,
+        body: JSON.stringify({title: title, body: body}),
+        headers: {
+          'Content-Type': 'application/json',
         },
-        (error) => {
-          // @TODO: throw error message
-          console.log(error);
-        }
-      );
+      })
+        .then((res) => res.json())
+        .then(
+          (result) => {
+            if (result.ok) {
+              if (location.selectedId && !isDeleting) {
+                setLocation({
+                  isEditing: false,
+                  selectedId: location.selectedId,
+                  searchText: location.searchText,
+                });
+              } else if (isDeleting || null == location.selectedId) {
+                setLocation({
+                  isEditing: false,
+                  selectedId: null,
+                  searchText: location.searchText,
+                });
+                resetForm();
+                deleteNote(false);
+              }
+            }
+          },
+          (error) => {
+            // @TODO: throw error message
+            console.log(error);
+          }
+        );
+    };
+    fetchData();
   }
 
   function resetForm() {
@@ -109,7 +99,6 @@ export default function NoteItem() {
   }
 
   let noteContent = <div>Select a note on the left sidebar..</div>;
-  // @TODO: write edit func for existing note
   if (location.isEditing) {
     let deleteButton = (
       <button
@@ -122,31 +111,23 @@ export default function NoteItem() {
       </button>
     );
     noteContent = (
-      <section id="note-item">
-        <form onSubmit={handleSubmit}>
-          <header>
+      <section id="note-edit" className="note-item h-100">
+        <form
+          onSubmit={handleSubmit}
+          className="d-flex flex-wrap h-100 position-relative">
+          <header className="w-100">
             <div className="row d-flex align-items-center">
-              <div
-                className="
-                                col-12 
-                                col-lg 
-                                flex-lg-shrink-1 
-                                h-100 mb-3 mb-xl-0
-                            ">
+              <div className="col-12 col-lg flex-lg-shrink-1 h-100 mb-3 mb-xl-0">
                 <small className="fst-italic text-muted">
                   {location.selectedId ? 'Edit note' : 'Add a note'}
                 </small>
               </div>
               <div
                 className="
-                                col-12 
-                                col-lg 
-                                flex-lg-grow-1
-                                justify-content-md-between 
-                                justify-content-lg-end 
-                                text-center
-                                d-flex
-                            ">
+                col-12 col-lg flex-lg-grow-1
+                justify-content-md-between 
+                justify-content-lg-end text-center d-flex
+              ">
                 <button type="submit" className="btn btn-primary save-note">
                   Save
                 </button>
@@ -177,14 +158,10 @@ export default function NoteItem() {
               />
             </h1>
           </header>
-          <article className="mt-4">
-            <textarea
-              name="note[body]"
-              className="form-control border-0 bg-light"
-              placeholder="Set note body"
-              value={body}
-              {...bindBody}
-            />
+          <article className="w-100 h-75 my-4">
+            <FormContext.Provider value={[body, setBody]}>
+              <Editor />
+            </FormContext.Provider>
           </article>
         </form>
       </section>
@@ -195,75 +172,7 @@ export default function NoteItem() {
     noteContent = <div>Error: {error}</div>;
   } else {
     if (null != location.selectedId && null != note && isLoaded) {
-      let {title, body, updated_at} = note;
-      const updatedAt = new Date(updated_at);
-      const lastUpdatedAt = format(updatedAt, "d MMM yyyy 'at' h:mm bb");
-
-      noteContent = (
-        <section id="note-item">
-          <header>
-            <div className="row d-flex align-items-center">
-              <div
-                className="
-                                col-12 
-                                col-lg 
-                                flex-lg-shrink-1 
-                                h-100 mb-3 mb-xl-0
-                            ">
-                <small className="fst-italic text-muted">
-                  Last updated at: {lastUpdatedAt}
-                </small>
-              </div>
-              <div
-                className="
-                                col-12 
-                                col-lg 
-                                flex-lg-grow-1
-                                justify-content-md-between 
-                                justify-content-lg-end 
-                                text-center
-                                d-flex
-                            ">
-                <button
-                  type="button"
-                  className="btn btn-primary edit-note"
-                  onClick={() => {
-                    setLocation({
-                      isEditing: true,
-                      selectedId: location.selectedId,
-                      searchText: location.searchText,
-                    });
-                  }}>
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-light close-note"
-                  onClick={() => {
-                    setLocation({
-                      isEditing: false,
-                      selectedId: null,
-                      searchText: location.searchText,
-                    });
-                    resetForm();
-                  }}>
-                  Close
-                </button>
-              </div>
-            </div>
-            <h1 className="mt-4">{title}</h1>
-          </header>
-          <article
-            className="mt-4"
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHtml(marked(body), {
-                allowedTags,
-                allowedAttributes,
-              }),
-            }}
-          />
-        </section>
-      );
+      noteContent = <NoteShow note={note} />;
     }
   }
 

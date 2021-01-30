@@ -1,12 +1,11 @@
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
 
-#note-item {
+.note-item {
     min-width: 100%;
     min-height: 100%;
     padding: 5rem;
     header {
-        // display: flex;
         h1 {
             margin: 0;
         }
@@ -17,22 +16,8 @@
             padding-left: $spacer * 3;
             padding-right: $spacer * 3;
         }
-        // .edit-note,.save-note {
-        //     // margin-left: auto;
-        // }
         .close-note,.cancel-note,.delete-note {
             margin-left: $spacer;
         }
     }
-    // .close-note {
-    //     position: absolute;
-    //     right: 0;
-    //     top: 0;
-    //     outline: initial;
-    //     box-shadow: initial;
-    //     img {
-    //         min-width: 25px;
-    //         min-height: 25px;
-    //     }
-    // }
 }

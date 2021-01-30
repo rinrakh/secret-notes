@@ -5,8 +5,6 @@ export const useInput = initialValue => {
 
     return {
         value,
-        // setValue,
-        // setValue: (val) => setValue(val),
         set: (val) => setValue(val),
         reset: () => setValue(initialValue),
         bind: {

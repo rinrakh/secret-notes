@@ -5,6 +5,7 @@ import NoteItem from './NoteItem';
 import './App.scss';
 
 export default function App() {
+  // @TODO: refactor useContext, save params somewhere for less code when use setLocation
   const [location, setLocation] = useState({
     selectedId: null,
     isEditing: null,

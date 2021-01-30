@@ -15,7 +15,7 @@ export default function Sidebar() {
     let url = '/notes';
     let timeOut = 0;
 
-    if ('' != location.searchText) {
+    if ('' !== location.searchText) {
       setIsLoaded(false);
       url = '/notes/s/' + location.searchText;
       timeOut = 500;
@@ -38,6 +38,7 @@ export default function Sidebar() {
 
     return () => clearTimeout(query);
   }, [location.isEditing, location.searchText]);
+  // @TODO: prevent rerender sidebar when use notes action like edit/save/delete etc.
 
   let noteList;
 
@@ -62,7 +63,6 @@ export default function Sidebar() {
           </a>
         </section>
         <section id="search" className="position-relative">
-          {/* @TODO: write search component */}
           <input
             type="search"
             name="search"
